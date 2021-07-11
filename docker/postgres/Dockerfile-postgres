@@ -1,0 +1,9 @@
+FROM postgres:11
+
+ENV POSTGRES_PASSWORD = 456
+COPY init.sh /docker-entrypoint-initdb.d/
+RUN sed 's/\r//' /docker-entrypoint-initdb.d/init.sh > /docker-entrypoint-initdb.d/init1.sh
+RUN rm /docker-entrypoint-initdb.d/init.sh
+RUN mv /docker-entrypoint-initdb.d/init1.sh /docker-entrypoint-initdb.d/init.sh
+
+EXPOSE 5432

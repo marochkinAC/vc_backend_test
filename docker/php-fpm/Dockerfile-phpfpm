@@ -1,0 +1,24 @@
+FROM php:7.4-fpm
+ARG USER_ID
+ARG IS_WINDOWS
+
+RUN apt-get update \
+    && apt-get install -y iproute2\
+    && apt-get install -y libpq-dev libonig-dev zlibc libzip-dev zlib1g libmemcached-dev libjpeg-dev libpng-dev\
+    && apt-get install -y libxml2-dev \
+    && pecl install redis \
+    && pecl install xdebug-3.0.2 \
+    && pecl install memcached \
+    && pecl install mongodb \
+    && docker-php-ext-install soap pdo_pgsql mbstring zip gd\
+    && docker-php-ext-enable soap redis xdebug pdo_pgsql mbstring memcached mongodb gd
+
+
+RUN echo xdebug.client_port=9009 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.idekey=PHP_STORM >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.start_with_request=1 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.mode=debug >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo xdebug.client_host=$(bash -c "if [ ${IS_WINDOWS} == 1 ]; then echo 'host.docker.internal'; else echo `/sbin/ip route|awk '/default/ { print $3 }'`; fi") >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+RUN bash -c "if [ ${IS_WINDOWS} != 1 ]; then usermod -u ${USER_ID} www-data; fi"
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

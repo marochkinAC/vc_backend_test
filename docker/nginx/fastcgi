@@ -1,0 +1,7 @@
+fastcgi_pass php:9000;
+fastcgi_read_timeout 90;
+fastcgi_keep_conn off;
+fastcgi_buffers 16 16k;
+fastcgi_buffer_size 32k;
+include fastcgi_params;
+fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;

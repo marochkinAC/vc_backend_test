@@ -1,0 +1,8 @@
+#!/bin/bash
+
+psql -U postgres <<-EOSQL
+    CREATE USER ads PASSWORD '123';
+    CREATE DATABASE ads;
+    GRANT ALL PRIVILEGES ON DATABASE ads TO ads;
+    ALTER USER ads CREATEDB;
+EOSQL
