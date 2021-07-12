@@ -11,7 +11,7 @@ use PDOException;
  */
 class DB
 {
-    private ?PDO $connect = null;
+    private PDO $connect;
     private ConnectionSettings $connectionSettings;
 
     /**

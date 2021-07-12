@@ -12,7 +12,7 @@ use Pimple\Container;
 
 class AdsServiceProvider implements IServiceProvider
 {
-    public function boot(Container $container)
+    public function boot(Container $container): void
     {
         $container[AdsRepository::class] = function () use ($container) {
             return new AdsRepository($container[DB::class]);

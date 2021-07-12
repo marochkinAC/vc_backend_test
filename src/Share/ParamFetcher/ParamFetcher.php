@@ -33,7 +33,7 @@ class ParamFetcher
      */
     public function getRequiredString(string $name): string
     {
-        $param = $this->inputBag->get($name);
+        $param = (string)$this->inputBag->get($name);
         return $this->checkRequiredParam($param, $name);
     }
 
@@ -77,7 +77,11 @@ class ParamFetcher
      */
     public function getOptionalString(string $name): ?string
     {
-        return $this->inputBag->get($name);
+        $result = $this->inputBag->get($name);
+        if (is_null($result)) {
+            return null;
+        }
+        return (string)$result;
     }
 
     /**

@@ -18,7 +18,7 @@ class JsonResponse extends Response
         parent::__construct();
         $this->headers->set('Content-Type', 'application/json');
         $this->setStatusCode($status);
-        $this->setContent(json_encode([
+        $this->setContent((string)json_encode([
             'message' => $msg,
             'code' => $code,
             'data' => $data,

@@ -54,7 +54,7 @@ class AdsRepository
     /**
      * @throws EntityLayerException
      */
-    public function save(Ads $ads)
+    public function save(Ads $ads): void
     {
         try {
             if (!$this->db->inTransaction()) {
@@ -81,7 +81,7 @@ class AdsRepository
         }
     }
 
-    public function flush()
+    public function flush(): void
     {
         if ($this->db->inTransaction()) {
             $this->db->commit();

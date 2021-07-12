@@ -8,5 +8,5 @@ use Pimple\Container;
 
 interface IServiceProvider
 {
-    public function boot(Container $container);
+    public function boot(Container $container): void;
 }

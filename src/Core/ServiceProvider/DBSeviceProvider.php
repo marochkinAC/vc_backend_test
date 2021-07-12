@@ -12,7 +12,7 @@ use Pimple\Container;
 class DBSeviceProvider implements IServiceProvider
 {
 
-    public function boot(Container $container)
+    public function boot(Container $container): void
     {
         $container[DB::class] = function () {
             $connectionSettings = require CONFIG . '/db.php';

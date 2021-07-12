@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Loader\PhpFileLoader;
 
 class RouteServiceProvider implements IServiceProvider
 {
-    public function boot(Container $container)
+    public function boot(Container $container): void
     {
         $container[Route::class] = function () {
             $fileLocator = new FileLocator(CONFIG);
