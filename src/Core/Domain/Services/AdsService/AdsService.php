@@ -49,9 +49,9 @@ class AdsService
             $this->adsRepository->flush();
             return $ads;
         } catch (ValidationErrorException $e) {
-            throw new ValidationParamsException($e->getMessage(),0, $e);
+            throw new ValidationParamsException($e->getMessage(), 0, $e);
         } catch (EntityLayerException $e) {
-            throw new ServicesLayerException('Error when try to add Ads',0, $e);
+            throw new ServicesLayerException('Error when try to add Ads', 0, $e);
         }
     }
 
@@ -93,11 +93,11 @@ class AdsService
             $this->adsRepository->flush();
             return $ads;
         } catch (ValidationErrorException $e) {
-                throw new ValidationParamsException($e->getMessage(),0, $e);
+            throw new ValidationParamsException($e->getMessage(), 0, $e);
         } catch (EntityNotFoundException $e) {
             throw new AdsNotFoundException('Ads with id ' . $id . ' not found', 0, $e);
         } catch (EntityLayerException $e) {
-            throw new ServicesLayerException('Error when try to update Ads',0, $e);
+            throw new ServicesLayerException('Error when try to update Ads', 0, $e);
         }
     }
 }

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Ads\Core\Domain\DBAL;
 
 use Ads\Core\Domain\DBAL\Exception\DBALException;
@@ -30,7 +31,7 @@ class DB
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
             );
         } catch (PDOException $ex) {
-            throw new DBALException('Error while connect to database',0 , $ex);
+            throw new DBALException('Error while connect to database', 0, $ex);
         }
     }
 
@@ -50,7 +51,7 @@ class DB
         try {
             $this->connect->beginTransaction();
         } catch (PDOException $ex) {
-            throw new DBALException('Error when try to begin transaction',0 , $ex);
+            throw new DBALException('Error when try to begin transaction', 0, $ex);
         }
     }
 
@@ -62,7 +63,7 @@ class DB
         try {
             $this->connect->commit();
         } catch (PDOException $ex) {
-            throw new DBALException('Error when try to commit transaction',0 , $ex);
+            throw new DBALException('Error when try to commit transaction', 0, $ex);
         }
     }
 
@@ -74,7 +75,7 @@ class DB
         try {
             $this->connect->rollBack();
         } catch (PDOException $ex) {
-            throw new DBALException('Error when try to rollback transaction',0 , $ex);
+            throw new DBALException('Error when try to rollback transaction', 0, $ex);
         }
     }
 
@@ -97,8 +98,8 @@ class DB
             $statement = $this->connect->prepare($sql);
             $statement->execute($values);
             return (int)$this->connect->lastInsertId();
-        }  catch (PDOException $ex) {
-            throw new DBALException('Error when try to insert row',0 , $ex);
+        } catch (PDOException $ex) {
+            throw new DBALException('Error when try to insert row', 0, $ex);
         }
     }
 
@@ -138,11 +139,7 @@ class DB
             }
             return [];
         } catch (PDOException $ex) {
-            throw new DBALException(
-                "Error when try to select row in table {$table} by id {$id} by field {$field}",
-                0 ,
-                $ex
-            );
+            throw new DBALException("Error when try to select row in table {$table} by id {$id} by field {$field}", 0, $ex);
         }
     }
 
@@ -161,15 +158,15 @@ class DB
             $sql = "UPDATE {$table} SET {$this->fieldsToSqlSet($fields)} WHERE {$field} = ?";
             $statement = $this->connect->prepare($sql);
             $statement->execute($values);
-        }  catch (PDOException $ex) {
-            throw new DBALException('Error when try to insert row',0 , $ex);
+        } catch (PDOException $ex) {
+            throw new DBALException('Error when try to insert row', 0, $ex);
         }
     }
 
     private function fieldsToSqlSet(array $fields): string
     {
         $fieldsWithPalseholder = array_map(fn($elem) => $elem . ' = ?', $fields);
-        return  implode(', ',$fieldsWithPalseholder);
+        return implode(', ', $fieldsWithPalseholder);
     }
 
     public function select(string $sql): array
@@ -179,7 +176,7 @@ class DB
             $statement->execute();
             return $statement->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $ex) {
-            throw new DBALException('Error when try to run select query',0 , $ex);
+            throw new DBALException('Error when try to run select query', 0, $ex);
         }
     }
 
@@ -188,7 +185,7 @@ class DB
         try {
             $this->connect->exec($sql);
         } catch (PDOException $ex) {
-            throw new DBALException('Error when try to run query',0 , $ex);
+            throw new DBALException('Error when try to run query', 0, $ex);
         }
     }
 

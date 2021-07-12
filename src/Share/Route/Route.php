@@ -32,7 +32,7 @@ class Route
             return (new $controller($request, $routeMatch))->$method();
         } catch (ResourceNotFoundException $e) {
             return new ErrorJsonResponse('Not found', [], Response::HTTP_NOT_FOUND);
-        }  catch (MethodNotAllowedException $e) {
+        } catch (MethodNotAllowedException $e) {
             return new ErrorJsonResponse('Method not allowed', []);
         } catch (Exception $e) {
             file_put_contents(ROOT . '/var/log.txt', $e->getMessage() . PHP_EOL, FILE_APPEND);

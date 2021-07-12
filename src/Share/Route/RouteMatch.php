@@ -18,7 +18,7 @@ class RouteMatch
     public function __construct(array $routeParams)
     {
         $this->routeParams = $routeParams;
-        $info = explode(':',  $this->routeParams['_controller']);
+        $info = explode(':', $this->routeParams['_controller']);
         $this->controller = $info[0];
         $this->controllerMethod = $info[1];
     }

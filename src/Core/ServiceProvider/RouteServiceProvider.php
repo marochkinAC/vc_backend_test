@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace Ads\Core\ServiceProvider;
+
 use Ads\Share\Route\Route;
 use Pimple\Container;
 use Symfony\Component\Config\FileLocator;

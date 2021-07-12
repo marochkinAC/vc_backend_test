@@ -47,7 +47,7 @@ class AdsRepository
             return Ads::fromState($row);
         } catch (DBALException $exception) {
             $this->db->rollback();
-            throw new EntityLayerException('Error searching Ads entity with id = ' . $id, 0 , $exception);
+            throw new EntityLayerException('Error searching Ads entity with id = ' . $id, 0, $exception);
         }
     }
 
@@ -77,7 +77,7 @@ class AdsRepository
             }
         } catch (DBALException $exception) {
             $this->db->rollback();
-            throw new EntityLayerException('Error saving Ads entity with id = ' . $ads->getId(), 0 , $exception);
+            throw new EntityLayerException('Error saving Ads entity with id = ' . $ads->getId(), 0, $exception);
         }
     }
 
