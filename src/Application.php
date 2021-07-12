@@ -4,15 +4,14 @@ declare(strict_types=1);
 namespace Ads;
 
 
-//use Ads\Request\Request;
-use Ads\Share\Response\JsonResponse;
+use Ads\Core\ServiceProvider\IServiceProvider;
 use Ads\Share\Route\Route;
 use Exception;
 use Pimple\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Application
+final class Application
 {
     private Container $container;
     private static ?Application $instance = null;
@@ -33,12 +32,12 @@ class Application
 
     public static function i(): self
     {
-        if (static::$instance === null) {
-            static::$instance = new static();
-            static::$instance->container = new Container();
-            static::$instance->bootstrap();
+        if (self::$instance === null) {
+            self::$instance = new self();
+            self::$instance->container = new Container();
+            self::$instance->bootstrap();
         }
-        return static::$instance;
+        return self::$instance;
 
     }
 
@@ -56,7 +55,7 @@ class Application
         $providers = require ROOT . '/config/providers.php';
         foreach ($providers as $providerClassName) {
             /**
-             * @var Ads\Core\ServiceProvider\IServiceProvider $provider
+             * @var IServiceProvider
              */
             $provider = new $providerClassName();
             $provider->boot($this->container);
@@ -70,6 +69,6 @@ class Application
 
     public static function resolve(string $className)
     {
-        return static::$instance->getInstance($className);
+        return self::$instance->getInstance($className);
     }
 }

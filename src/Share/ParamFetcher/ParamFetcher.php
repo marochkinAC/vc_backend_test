@@ -101,17 +101,17 @@ class ParamFetcher
      * @param Request $request
      * @return static
      */
-    public static function fromRequestGet(Request $request)
+    public static function fromRequestGet(Request $request): self
     {
-        return new static($request->query);
+        return new self($request->query);
     }
 
     /**
      * @param Request $request
      * @return static
      */
-    public static function fromRequestPost(Request $request)
+    public static function fromRequestPost(Request $request): self
     {
-        return new static($request->request);
+        return new self($request->request);
     }
 }

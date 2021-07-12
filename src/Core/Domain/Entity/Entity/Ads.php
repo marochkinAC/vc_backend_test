@@ -3,6 +3,8 @@
 
 namespace Ads\Core\Domain\Entity\Entity;
 
+use Ads\Core\Domain\Entity\Exception\ValidationErrorException;
+
 /**
  * Class Ads
  * Класс представляющий сущность рекламного объявления в предметной области
@@ -13,7 +15,7 @@ class Ads
     /**
      * @var int - id в репозитории
      */
-    private int $id;
+    private int $id = 0;
     /**
      * @var string - заголовок рекламного объявления
      */
@@ -37,20 +39,19 @@ class Ads
 
     /**
      * Ads constructor.
-     * @param int $id
      * @param string $text
      * @param float $price
      * @param int $limit
      * @param string $banner
+     * @throws ValidationErrorException -
      */
-    public function __construct(int $id, string $text, float $price, int $limit, string $banner)
+    public function __construct(string $text, float $price, int $limit, string $banner)
     {
-        $this->id = $id;
-        $this->text = $text;
-        $this->price = $price;
-        $this->limit = $limit;
-        $this->banner = $banner;
-        $this->show_count = 0;
+        $this->setText($text);
+        $this->setPrice($price);
+        $this->setLimit($limit);
+        $this->setBanner($banner);
+        $this->setShowCount(0);
     }
 
     /**
@@ -63,9 +64,13 @@ class Ads
 
     /**
      * @param int $show_count
+     * @throws ValidationErrorException
      */
     public function setShowCount(int $show_count): void
     {
+        if ($show_count < 0) {
+            throw new ValidationErrorException('Show count must be more or equal zero');
+        }
         $this->show_count = $show_count;
     }
 
@@ -135,9 +140,13 @@ class Ads
 
     /**
      * @param int $limit
+     * @throws ValidationErrorException
      */
     public function setLimit(int $limit): void
     {
+        if ($limit < 0) {
+            throw new ValidationErrorException('Limit must be more or equal zero');
+        }
         $this->limit = $limit;
     }
 
@@ -149,15 +158,20 @@ class Ads
         $this->banner = $banner;
     }
 
+    /**
+     * @param array $state
+     * @return Ads
+     * @throws ValidationErrorException
+     */
     public static function fromState(array $state): Ads
     {
         $ads = new self(
-            (int)$state['id'],
             $state['text'],
             (float)$state['price'],
             (int)$state['show_limit'],
             $state['banner']
         );
+        $ads->setId((int)$state['id']);
         $ads->setShowCount($state['show_count']);
         return $ads;
     }

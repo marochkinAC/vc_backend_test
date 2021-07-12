@@ -39,7 +39,7 @@ class AdsService
      */
     public function addAds(string $text, string $banner, int $limit, float $price): Ads
     {
-        $ads = new Ads(0, $text, $price, $limit, $banner);
+        $ads = new Ads($text, $price, $limit, $banner);
         $this->adsRepository->save($ads);
         return $ads;
     }

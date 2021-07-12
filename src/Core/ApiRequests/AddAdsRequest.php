@@ -28,7 +28,7 @@ class AddAdsRequest
     public static function fromRequest(Request $request): self
     {
         $paramFetcher = ParamFetcher::fromRequestPost($request);
-        $addRequest = new static();
+        $addRequest = new self();
         $addRequest->limit = $paramFetcher->getRequiredInt('limit');
         $addRequest->price = $paramFetcher->getRequiredFloat('price');
         $addRequest->text = $paramFetcher->getRequiredString('text');
