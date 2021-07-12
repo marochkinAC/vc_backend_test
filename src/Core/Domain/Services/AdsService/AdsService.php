@@ -46,6 +46,7 @@ class AdsService
         try {
             $ads = new Ads($text, $price, $limit, $banner);
             $this->adsRepository->save($ads);
+            $this->adsRepository->flush();
             return $ads;
         } catch (ValidationErrorException $e) {
             throw new ValidationParamsException($e->getMessage(),0, $e);
@@ -75,19 +76,20 @@ class AdsService
     {
         try {
             $ads = $this->adsRepository->findById($id);
-            if ($text) {
+            if (isset($text)) {
                 $ads->setText($text);
             }
-            if ($banner) {
+            if (isset($banner)) {
                 $ads->setBanner($banner);
             }
-            if ($limit) {
+            if (isset($limit)) {
                 $ads->setLimit($limit);
             }
-            if ($price) {
+            if (isset($price)) {
                 $ads->setPrice($price);
             }
             $this->adsRepository->save($ads);
+            $this->adsRepository->flush();
             return $ads;
         } catch (EntityNotFoundException $e) {
             throw new AdsNotFoundException('Ads with id ' . $id . ' not found', 0, $e);

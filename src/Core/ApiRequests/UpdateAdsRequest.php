@@ -21,7 +21,7 @@ class UpdateAdsRequest
 
     /**
      * @param Request $request
-     * @return static
+     * @return self
      */
     public static function fromRequest(Request $request): self
     {

@@ -45,7 +45,7 @@ class DB
     /**
      * @throws DBALException
      */
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
         try {
             $this->connect->beginTransaction();
@@ -57,7 +57,7 @@ class DB
     /**
      * @throws DBALException
      */
-    public function commit()
+    public function commit(): void
     {
         try {
             $this->connect->commit();
@@ -69,7 +69,7 @@ class DB
     /**
      * @throws DBALException
      */
-    public function rollback()
+    public function rollback(): void
     {
         try {
             $this->connect->rollBack();
@@ -83,6 +83,11 @@ class DB
         return $this->connect;
     }
 
+    /**
+     * @param string $table
+     * @param array $data
+     * @return int
+     */
     public function insertRow(string $table, array $data): int
     {
         try {
@@ -97,20 +102,34 @@ class DB
         }
     }
 
+    /**
+     * @param string[] $fields
+     * @return string
+     */
     private function placeInsertFields(array $fields): string
     {
         return '(' . implode(', ', $fields) . ')';
     }
 
+    /**
+     * @param array $values
+     * @return string
+     */
     private function placeInsertValues(array $values): string
     {
         return '(' . implode(', ', array_pad([], count($values), '?')) . ')';
     }
 
-    public function selectById(string $table, string $field, int $id): array
+    /**
+     * @param string $table
+     * @param string $field
+     * @param int $id
+     * @return array
+     */
+    public function selectByIdForUpdate(string $table, string $field, int $id): array
     {
         try {
-            $sql = "SELECT * FROM {$table} WHERE {$field} = ?";
+            $sql = "SELECT * FROM {$table} WHERE {$field} = ? FOR UPDATE";
             $statement = $this->connect->prepare($sql);
             $statement->execute([$id]);
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -127,7 +146,13 @@ class DB
         }
     }
 
-    public function updateById(string $table, string $field, int $id, array $data)
+    /**
+     * @param string $table
+     * @param string $field
+     * @param int $id
+     * @param array $data
+     */
+    public function updateById(string $table, string $field, int $id, array $data): void
     {
         try {
             $fields = array_keys($data);
@@ -165,5 +190,10 @@ class DB
         } catch (PDOException $ex) {
             throw new DBALException('Error when try to run query',0 , $ex);
         }
+    }
+
+    public function inTransaction(): bool
+    {
+        return $this->connect->inTransaction();
     }
 }

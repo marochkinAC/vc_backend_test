@@ -3,10 +3,10 @@
 
 namespace Ads\Core\Domain\Services\RelevantAdsService;
 
-use Ads\Core\Domain\DBAL\DB;
-use Ads\Core\Domain\DBAL\Exception\DBALException;
 use Ads\Core\Domain\Entity\Entity\Ads;
-use Ads\Core\Domain\Entity\Exception\ValidationErrorException;
+use Ads\Core\Domain\Entity\Exception\EntityLayerException;
+use Ads\Core\Domain\Entity\Exception\EntityNotFoundException;
+use Ads\Core\Domain\Entity\Repository\AdsRepository;
 use Ads\Core\Domain\Services\RelevantAdsService\Exception\RelevantAdsNotFound;
 use Ads\Core\Domain\Services\ServicesLayerException;
 
@@ -17,16 +17,15 @@ use Ads\Core\Domain\Services\ServicesLayerException;
  */
 class RelevantAdsService
 {
-    private DB $db;
-
+    private AdsRepository $adsRepository;
 
     /**
-     * RelevantAdsService constructor.
-     * @param DB $db
+     * AdsService constructor.
+     * @param AdsRepository $adsRepository
      */
-    public function __construct(DB $db)
+    public function __construct(AdsRepository $adsRepository)
     {
-        $this->db = $db;
+        $this->adsRepository = $adsRepository;
     }
 
     /**
@@ -39,24 +38,15 @@ class RelevantAdsService
     public function showRelevantAds(): Ads
     {
         try {
-            $this->db->beginTransaction();
-            //Используем блокировку записи внутри транзакции, чтобы избежать race condition
-            $result = $this->db->select('SELECT * FROM advs WHERE show_limit > show_count ORDER BY price DESC LIMIT 1 FOR UPDATE');
-            if ($result) {
-                $ads = Ads::fromState(array_shift($result));
-                $this->db->query("UPDATE advs SET show_count = show_count + 1 WHERE id = {$ads->getId()}");
-                $this->db->commit();
-                return $ads;
-            } else {
-                $this->db->rollback();
-                throw new RelevantAdsNotFound('Relevant ads not found', 0);
-            }
-        } catch (DBALException $exception) {
-            $this->db->rollback();
-            throw new ServicesLayerException('Error when try show relevant ads', 0, $exception);
-        } catch (ValidationErrorException $e) {
-            $this->db->rollback();
-            throw new ServicesLayerException('Error when try validate ads object from repository', 0, $e);
+            $ads = $this->adsRepository->findRelevantAds();
+            $ads->setShowCount($ads->getShowCount() + 1);
+            $this->adsRepository->save($ads);
+            $this->adsRepository->flush();
+            return $ads;
+        } catch (EntityNotFoundException $e) {
+            throw new RelevantAdsNotFound('Relevant ads not found', 0, $e);
+        } catch (EntityLayerException $e) {
+            throw new ServicesLayerException('Error when try show relevant ads', 0, $e);
         }
     }
 

@@ -50,7 +50,7 @@ final class Application
         return $router->run($request);
     }
 
-    private function bootstrap()
+    private function bootstrap(): void
     {
         $providers = require ROOT . '/config/providers.php';
         foreach ($providers as $providerClassName) {
@@ -62,11 +62,19 @@ final class Application
         }
     }
 
+    /**
+     * @param string $className
+     * @return mixed
+     */
     public function getInstance(string $className)
     {
         return $this->container[$className];
     }
 
+    /**
+     * @param string $className
+     * @return mixed
+     */
     public static function resolve(string $className)
     {
         return self::$instance->getInstance($className);

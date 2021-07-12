@@ -28,7 +28,7 @@ class ParamFetcher
 
     /**
      * @param string $name
-     * @return mixed
+     * @return string
      * @throws RequiredParamNotFound
      */
     public function getRequiredString(string $name): string
@@ -38,6 +38,7 @@ class ParamFetcher
     }
 
     /**
+     * @return mixed
      * @throws RequiredParamNotFound
      */
     private function checkRequiredParam($param, $name)
@@ -99,7 +100,7 @@ class ParamFetcher
 
     /**
      * @param Request $request
-     * @return static
+     * @return self
      */
     public static function fromRequestGet(Request $request): self
     {
@@ -108,7 +109,7 @@ class ParamFetcher
 
     /**
      * @param Request $request
-     * @return static
+     * @return self
      */
     public static function fromRequestPost(Request $request): self
     {

@@ -22,7 +22,7 @@ class AddAdsRequest
 
     /**
      * @param Request $request
-     * @return static
+     * @return self
      * @throws RequiredParamNotFound
      */
     public static function fromRequest(Request $request): self

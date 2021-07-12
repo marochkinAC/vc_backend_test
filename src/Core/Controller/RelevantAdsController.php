@@ -5,7 +5,6 @@ namespace Ads\Core\Controller;
 
 
 use Ads\Application;
-use Ads\Core\Domain\DBAL\DB;
 use Ads\Core\Domain\Services\RelevantAdsService\Exception\RelevantAdsNotFound;
 use Ads\Core\Domain\Services\RelevantAdsService\RelevantAdsService;
 use Ads\Core\Domain\Services\ServicesLayerException;
@@ -32,7 +31,7 @@ class RelevantAdsController extends AbstractController
     public function __construct(Request $request, RouteMatch $routeMatch)
     {
         parent::__construct($request, $routeMatch);
-        $this->relevantAdsService = new RelevantAdsService(Application::resolve(DB::class));
+        $this->relevantAdsService = Application::resolve(RelevantAdsService::class);
     }
 
     /**

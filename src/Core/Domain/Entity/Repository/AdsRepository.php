@@ -9,6 +9,7 @@ use Ads\Core\Domain\DBAL\Exception\DBALException;
 use Ads\Core\Domain\Entity\Entity\Ads;
 use Ads\Core\Domain\Entity\Exception\EntityLayerException;
 use Ads\Core\Domain\Entity\Exception\EntityNotFoundException;
+use Ads\Core\Domain\Entity\Exception\ValidationErrorException;
 
 /**
  * Class AdsRepository
@@ -34,12 +35,18 @@ class AdsRepository
     public function findById(int $id): Ads
     {
         try {
-            $row = $this->db->selectById('advs', 'id', $id);
-            if ($row) {
-                return Ads::fromState($row);
+            if (!$this->db->inTransaction()) {
+                $this->db->beginTransaction();
             }
-            throw new EntityNotFoundException('Ads entity id = ' . $id . ' not found');
+
+            $row = $this->db->selectByIdForUpdate('advs', 'id', $id);
+            if (!$row) {
+                throw new EntityNotFoundException('Ads entity id = ' . $id . ' not found');
+            }
+
+            return Ads::fromState($row);
         } catch (DBALException $exception) {
+            $this->db->rollback();
             throw new EntityLayerException('Error searching Ads entity with id = ' . $id, 0 , $exception);
         }
     }
@@ -50,6 +57,10 @@ class AdsRepository
     public function save(Ads $ads)
     {
         try {
+            if (!$this->db->inTransaction()) {
+                $this->db->beginTransaction();
+            }
+
             $data = [
                 'show_limit' => $ads->getLimit(),
                 'show_count' => $ads->getShowCount(),
@@ -65,7 +76,38 @@ class AdsRepository
                 $ads->setId($id);
             }
         } catch (DBALException $exception) {
+            $this->db->rollback();
             throw new EntityLayerException('Error saving Ads entity with id = ' . $ads->getId(), 0 , $exception);
+        }
+    }
+
+    public function flush()
+    {
+        if ($this->db->inTransaction()) {
+            $this->db->commit();
+        }
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws EntityLayerException
+     */
+    public function findRelevantAds(): Ads
+    {
+        try {
+            if (!$this->db->inTransaction()) {
+                $this->db->beginTransaction();
+            }
+
+            $result = $this->db->select('SELECT * FROM advs WHERE show_limit > show_count ORDER BY price DESC LIMIT 1 FOR UPDATE');
+            if ($result) {
+                return Ads::fromState(array_shift($result));
+            } else {
+                throw new EntityNotFoundException('Relevant ads not found', 0);
+            }
+        } catch (ValidationErrorException $e) {
+            $this->db->rollback();
+            throw new EntityLayerException('Error when try validate ads object from repository', 0, $e);
         }
     }
 }

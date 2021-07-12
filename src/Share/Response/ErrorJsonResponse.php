@@ -6,7 +6,7 @@ namespace Ads\Share\Response;
 
 class ErrorJsonResponse extends JsonResponse
 {
-    public function __construct(string $msg, array $data, $code = self::HTTP_BAD_REQUEST)
+    public function __construct(string $msg, array $data, int $code = self::HTTP_BAD_REQUEST)
     {
         parent::__construct($msg, $code, $data);
     }
