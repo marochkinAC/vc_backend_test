@@ -4,6 +4,7 @@
 namespace Ads\Share\ParamFetcher;
 
 
+use Ads\Share\ParamFetcher\Exception\NotCorrectTypeParam;
 use Ads\Share\ParamFetcher\Exception\RequiredParamNotFound;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,11 +31,15 @@ class ParamFetcher
      * @param string $name
      * @return string
      * @throws RequiredParamNotFound
+     * @throws NotCorrectTypeParam
      */
     public function getRequiredString(string $name): string
     {
-        $param = (string)$this->inputBag->get($name);
-        return $this->checkRequiredParam($param, $name);
+        $param = $this->checkRequiredParam($this->inputBag->get($name), $name);
+        if (is_string($param)) {
+            return $param;
+        }
+        throw new NotCorrectTypeParam('Param `' . $name . '` have invalid type');
     }
 
     /**
@@ -43,8 +48,8 @@ class ParamFetcher
      */
     private function checkRequiredParam($param, $name)
     {
-        if (!$param) {
-            throw new RequiredParamNotFound($name, 'Required param ' . $name . ' not found');
+        if (!isset($param)) {
+            throw new RequiredParamNotFound($name, 'Required param `' . $name . '` not found');
         }
         return $param;
     }
@@ -53,22 +58,30 @@ class ParamFetcher
      * @param string $name
      * @return int
      * @throws RequiredParamNotFound
+     * @throws NotCorrectTypeParam
      */
     public function getRequiredInt(string $name): int
     {
-        $param = $this->inputBag->getInt($name);
-        return $this->checkRequiredParam($param, $name);
+        $param = $this->checkRequiredParam($this->inputBag->get($name), $name);
+        if (is_numeric($param)) {
+            return (int)$param;
+        }
+        throw new NotCorrectTypeParam('Param `' . $name . '` have invalid type');
     }
 
     /**
      * @param string $name
      * @return float
      * @throws RequiredParamNotFound
+     * @throws NotCorrectTypeParam
      */
     public function getRequiredFloat(string $name): float
     {
-        $param = (float)$this->inputBag->getDigits($name);
-        return $this->checkRequiredParam($param, $name);
+        $param = $this->checkRequiredParam($this->inputBag->get($name), $name);
+        if (is_numeric($param)) {
+            return (float)$param;
+        }
+        throw new NotCorrectTypeParam('Param `' . $name . '` have invalid type');
     }
 
     /**
@@ -90,7 +103,11 @@ class ParamFetcher
      */
     public function getOptionalInt(string $name): ?int
     {
-        return $this->inputBag->getInt($name);
+        $result = $this->inputBag->get($name);
+        if (is_numeric($result)) {
+            return (int)$result;
+        }
+        return null;
     }
 
     /**
@@ -99,7 +116,11 @@ class ParamFetcher
      */
     public function getOptionalFloat(string $name): ?float
     {
-        return (float)$this->inputBag->getDigits($name);
+        $result = $this->inputBag->get($name);
+        if (is_numeric($result)) {
+            return (float)$result;
+        }
+        return null;
     }
 
     /**

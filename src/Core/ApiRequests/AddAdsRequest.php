@@ -4,7 +4,7 @@
 namespace Ads\Core\ApiRequests;
 
 
-use Ads\Share\ParamFetcher\Exception\RequiredParamNotFound;
+use Ads\Share\ParamFetcher\Exception\ParamFetcherException;
 use Ads\Share\ParamFetcher\ParamFetcher;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -23,16 +23,20 @@ class AddAdsRequest
     /**
      * @param Request $request
      * @return self
-     * @throws RequiredParamNotFound
+     * @throws RequestValidationError
      */
     public static function fromRequest(Request $request): self
     {
-        $paramFetcher = ParamFetcher::fromRequestPost($request);
-        $addRequest = new self();
-        $addRequest->limit = $paramFetcher->getRequiredInt('limit');
-        $addRequest->price = $paramFetcher->getRequiredFloat('price');
-        $addRequest->text = $paramFetcher->getRequiredString('text');
-        $addRequest->banner = $paramFetcher->getRequiredString('banner');
-        return $addRequest;
+        try {
+            $paramFetcher = ParamFetcher::fromRequestPost($request);
+            $addRequest = new self();
+            $addRequest->limit = $paramFetcher->getRequiredInt('limit');
+            $addRequest->price = $paramFetcher->getRequiredFloat('price');
+            $addRequest->text = $paramFetcher->getRequiredString('text');
+            $addRequest->banner = $paramFetcher->getRequiredString('banner');
+            return $addRequest;
+        } catch (ParamFetcherException $exception) {
+            throw new RequestValidationError($exception->getMessage(), 0, $exception);
+        }
     }
 }

@@ -6,12 +6,12 @@ namespace Ads\Core\Controller;
 
 use Ads\Core\ApiRequests\AddAdsRequest;
 use Ads\Application;
+use Ads\Core\ApiRequests\RequestValidationError;
 use Ads\Core\ApiRequests\UpdateAdsRequest;
 use Ads\Core\Domain\Services\AdsService\AdsService;
 use Ads\Core\Domain\Services\AdsService\Exception\AdsNotFoundException;
 use Ads\Core\Domain\Services\AdsService\Exception\ValidationParamsException;
 use Ads\Core\Domain\Services\ServicesLayerException;
-use Ads\Share\ParamFetcher\Exception\RequiredParamNotFound;
 use Ads\Share\Response\ErrorJsonResponse;
 use Ads\Share\Response\SuccessJsonResponse;
 use Ads\Share\Route\RouteMatch;
@@ -55,9 +55,7 @@ class AdsController extends AbstractController
                 'text' => $ads->getText(),
                 'banner' => $ads->getBanner()
             ]);
-        } catch (RequiredParamNotFound $e) {
-            return new ErrorJsonResponse('Required param `' . $e->getParam() . '` not found', []);
-        } catch (ValidationParamsException $e) {
+        } catch (ValidationParamsException | RequestValidationError $e) {
             return new ErrorJsonResponse($e->getMessage(), []);
         }
     }
@@ -86,6 +84,8 @@ class AdsController extends AbstractController
             ]);
         } catch (AdsNotFoundException $e) {
             return new ErrorJsonResponse('Ads id=`' . $id . '` not found', []);
+        } catch (ValidationParamsException $e) {
+            return new ErrorJsonResponse($e->getMessage(), []);
         }
     }
 }

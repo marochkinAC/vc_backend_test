@@ -64,6 +64,7 @@ class AdsService
      * @param float|null $price - цена одного показа
      * @return Ads - обновленная entity
      * @throws AdsNotFoundException - если сущность не найдена в репозитории
+     * @throws ValidationParamsException - если произошли ошибки валидации
      * @throws ServicesLayerException - при любой другой ошибке
      */
     public function updateAds(
@@ -91,6 +92,8 @@ class AdsService
             $this->adsRepository->save($ads);
             $this->adsRepository->flush();
             return $ads;
+        } catch (ValidationErrorException $e) {
+                throw new ValidationParamsException($e->getMessage(),0, $e);
         } catch (EntityNotFoundException $e) {
             throw new AdsNotFoundException('Ads with id ' . $id . ' not found', 0, $e);
         } catch (EntityLayerException $e) {

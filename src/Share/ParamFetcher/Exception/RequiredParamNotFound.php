@@ -6,7 +6,7 @@ namespace Ads\Share\ParamFetcher\Exception;
 
 use Throwable;
 
-class RequiredParamNotFound extends \Exception
+class RequiredParamNotFound extends ParamFetcherException
 {
     private string $param;
 
