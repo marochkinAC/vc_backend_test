@@ -10,3 +10,4 @@
 ```
   PS D:\projects\vc> .\win_local.ps1
 ```
+После запуска проекта API доступно по адресу: http://localhost:8080/ads

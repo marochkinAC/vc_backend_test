@@ -6,6 +6,7 @@ namespace Ads\Core\Domain\Services\RelevantAdsService;
 use Ads\Core\Domain\DBAL\DB;
 use Ads\Core\Domain\DBAL\Exception\DBALException;
 use Ads\Core\Domain\Entity\Entity\Ads;
+use Ads\Core\Domain\Entity\Exception\ValidationErrorException;
 use Ads\Core\Domain\Services\RelevantAdsService\Exception\RelevantAdsNotFound;
 use Ads\Core\Domain\Services\ServicesLayerException;
 
@@ -32,7 +33,7 @@ class RelevantAdsService
      * Метод для открутки рекламных объявлений
      * Возвращает текущее подходящее рекламное объявление
      * При этом автоматически увеличивает количество показов у релевантного объявления
-     * @throws RelevantAdsNotFound
+     * @throws RelevantAdsNotFound - если не удается найти релевантное объявление
      * @throws ServicesLayerException
      */
     public function showRelevantAds(): Ads
@@ -53,6 +54,9 @@ class RelevantAdsService
         } catch (DBALException $exception) {
             $this->db->rollback();
             throw new ServicesLayerException('Error when try show relevant ads', 0, $exception);
+        } catch (ValidationErrorException $e) {
+            $this->db->rollback();
+            throw new ServicesLayerException('Error when try validate ads object from repository', 0, $e);
         }
     }
 

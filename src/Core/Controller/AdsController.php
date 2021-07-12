@@ -7,9 +7,10 @@ namespace Ads\Core\Controller;
 use Ads\Core\ApiRequests\AddAdsRequest;
 use Ads\Application;
 use Ads\Core\ApiRequests\UpdateAdsRequest;
-use Ads\Core\Domain\Entity\Exception\EntityLayerException;
 use Ads\Core\Domain\Services\AdsService\AdsService;
 use Ads\Core\Domain\Services\AdsService\Exception\AdsNotFoundException;
+use Ads\Core\Domain\Services\AdsService\Exception\ValidationParamsException;
+use Ads\Core\Domain\Services\ServicesLayerException;
 use Ads\Share\ParamFetcher\Exception\RequiredParamNotFound;
 use Ads\Share\Response\ErrorJsonResponse;
 use Ads\Share\Response\SuccessJsonResponse;
@@ -36,7 +37,7 @@ class AdsController extends AbstractController
 
     /**
      * @return Response
-     * @throws EntityLayerException
+     * @throws ServicesLayerException
      */
     public function add(): Response
     {
@@ -56,13 +57,15 @@ class AdsController extends AbstractController
             ]);
         } catch (RequiredParamNotFound $e) {
             return new ErrorJsonResponse('Required param `' . $e->getParam() . '` not found', []);
+        } catch (ValidationParamsException $e) {
+            return new ErrorJsonResponse($e->getMessage(), []);
         }
     }
 
 
     /**
      * @return Response
-     * @throws EntityLayerException
+     * @throws ServicesLayerException
      */
     public function update(): Response
     {

@@ -7,8 +7,11 @@ namespace Ads\Core\Domain\Services\AdsService;
 use Ads\Core\Domain\Entity\Entity\Ads;
 use Ads\Core\Domain\Entity\Exception\EntityLayerException;
 use Ads\Core\Domain\Entity\Exception\EntityNotFoundException;
+use Ads\Core\Domain\Entity\Exception\ValidationErrorException;
 use Ads\Core\Domain\Entity\Repository\AdsRepository;
 use Ads\Core\Domain\Services\AdsService\Exception\AdsNotFoundException;
+use Ads\Core\Domain\Services\AdsService\Exception\ValidationParamsException;
+use Ads\Core\Domain\Services\ServicesLayerException;
 
 
 /**
@@ -35,13 +38,20 @@ class AdsService
      * @param int $limit
      * @param float $price
      * @return Ads - entity добавленного объявления
-     * @throws EntityLayerException
+     * @throws ValidationParamsException - при ошибке валидации
+     * @throws ServicesLayerException - при любой другой ошибке
      */
     public function addAds(string $text, string $banner, int $limit, float $price): Ads
     {
-        $ads = new Ads($text, $price, $limit, $banner);
-        $this->adsRepository->save($ads);
-        return $ads;
+        try {
+            $ads = new Ads($text, $price, $limit, $banner);
+            $this->adsRepository->save($ads);
+            return $ads;
+        } catch (ValidationErrorException $e) {
+            throw new ValidationParamsException($e->getMessage(),0, $e);
+        } catch (EntityLayerException $e) {
+            throw new ServicesLayerException('Error when try to add Ads',0, $e);
+        }
     }
 
 
@@ -52,8 +62,8 @@ class AdsService
      * @param int|null $limit - лимит показов
      * @param float|null $price - цена одного показа
      * @return Ads - обновленная entity
-     * @throws AdsNotFoundException
-     * @throws EntityLayerException
+     * @throws AdsNotFoundException - если сущность не найдена в репозитории
+     * @throws ServicesLayerException - при любой другой ошибке
      */
     public function updateAds(
         int $id,
@@ -81,6 +91,8 @@ class AdsService
             return $ads;
         } catch (EntityNotFoundException $e) {
             throw new AdsNotFoundException('Ads with id ' . $id . ' not found', 0, $e);
+        } catch (EntityLayerException $e) {
+            throw new ServicesLayerException('Error when try to update Ads',0, $e);
         }
     }
 }

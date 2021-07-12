@@ -4,6 +4,8 @@
 namespace Ads\Core\Domain\Entity\Entity;
 
 use Ads\Core\Domain\Entity\Exception\ValidationErrorException;
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validation;
 
 /**
  * Class Ads
@@ -43,7 +45,7 @@ class Ads
      * @param float $price
      * @param int $limit
      * @param string $banner
-     * @throws ValidationErrorException -
+     * @throws ValidationErrorException
      */
     public function __construct(string $text, float $price, int $limit, string $banner)
     {
@@ -69,7 +71,7 @@ class Ads
     public function setShowCount(int $show_count): void
     {
         if ($show_count < 0) {
-            throw new ValidationErrorException('Show count must be more or equal zero');
+            throw new ValidationErrorException('Show count must be non-negative');
         }
         $this->show_count = $show_count;
     }
@@ -132,9 +134,13 @@ class Ads
 
     /**
      * @param float $price
+     * @throws ValidationErrorException
      */
     public function setPrice(float $price): void
     {
+        if ($price <= 0) {
+            throw new ValidationErrorException('Price must be positive');
+        }
         $this->price = $price;
     }
 
@@ -145,16 +151,24 @@ class Ads
     public function setLimit(int $limit): void
     {
         if ($limit < 0) {
-            throw new ValidationErrorException('Limit must be more or equal zero');
+            throw new ValidationErrorException('Limit must be non-negative');
         }
         $this->limit = $limit;
     }
 
     /**
      * @param string $banner
+     * @throws ValidationErrorException
      */
     public function setBanner(string $banner): void
     {
+        $validator = Validation::createValidator();
+        $errors = $validator->validate($banner, [
+            new Url(),
+        ]);
+        if ($errors->count() !== 0) {
+            throw new ValidationErrorException('Invalid banner link');
+        }
         $this->banner = $banner;
     }
 
